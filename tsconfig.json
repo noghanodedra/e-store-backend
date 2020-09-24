@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "paths": {
+      "@configs/*": ["configs/*"],
+      "@entities/*": ["entities/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "allowJs": false,
+    "noEmit": true,
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "forceConsistentCasingInFileNames": false
+  },
+  "exclude": ["node_modules"],
+  "include": ["./src"]
+}
