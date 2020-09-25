@@ -1,10 +1,14 @@
-import { User } from '@entities/User';
+import { User } from '@entities/user';
+import { CustomValidationError } from '@utils/errors';
+import { hash } from 'bcryptjs';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+
 import { UserRepository } from './user.repository';
 
 @Service()
 export class UserService {
+  private PASSWORD_HASH_SEED = 15;
   // using constructor injection
   constructor(
     @InjectRepository()
@@ -16,7 +20,10 @@ export class UserService {
   }
 
   public async create(user: User): Promise<User> {
+    if (this.userExist(user)) {
+      throw new CustomValidationError('Duplicate record');
+    }
+    user.password = await hash(user.password, this.PASSWORD_HASH_SEED);
     return await this.userRepository.save(user);
   }
-
 }

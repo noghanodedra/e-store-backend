@@ -6,10 +6,14 @@ import * as bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-import { ConnectionOptions, createConnection } from 'typeorm';
+import Container from 'typedi';
+import { ConnectionOptions, createConnection, useContainer } from 'typeorm';
 
 import envConfig from './src/configs';
 import { Routes } from './src/routes';
+import { handleErrors } from './src/utils/handle-errors';
+
+useContainer(Container);
 
 class App {
   public app: express.Application;
@@ -20,6 +24,7 @@ class App {
     this.config();
     this.dbSetup();
     this.routes.routes(this.app);
+    this.app.use(handleErrors);
   }
 
   private config(): void {
@@ -32,6 +37,7 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.disable('x-powered-by'); // disable X-Powered-By header
     this.app.use(compression());
+
     const PORT = envConfig.port || 4000;
     this.app.listen(PORT, () => {
       console.log(`🚀 Server ready at http://localhost:${PORT}`);

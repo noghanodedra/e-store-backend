@@ -16,17 +16,20 @@ export class User extends BaseEntity {
   @ObjectIdColumn()
   public id: ObjectID;
 
-  @Column()
+  @Column({ nullable: false })
   public fullName: string;
 
   @Column({ default: false })
   public active: boolean;
 
-  @Column()
+  @Column({ nullable: false })
   public email: string;
 
-  @Column()
+  @Column({ nullable: false, select: false })
   public password: string;
+
+  @Column({ nullable: true})
+  public avatarUrl?: string;
 
   @Column({ type: 'timestamp' })
   public lastLoggedIn: Date;

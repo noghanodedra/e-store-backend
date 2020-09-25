@@ -5,7 +5,8 @@
     "paths": {
       "@configs/*": ["configs/*"],
       "@entities/*": ["entities/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@shared/*": ["api/shared/*"]
     },
     "allowJs": false,
     "noEmit": true,
@@ -13,6 +14,7 @@
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
+    "noImplicitAny": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
