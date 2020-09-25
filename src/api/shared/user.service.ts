@@ -1,3 +1,4 @@
+import { Token } from '@entities/token';
 import { User } from '@entities/user';
 import { AuthHelper } from '@utils/auth-helper';
 import { CustomValidationError } from '@utils/errors';
@@ -5,6 +6,7 @@ import { compare, hash } from 'bcryptjs';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
+import { TokenRepository } from './token.repository';
 import { UserRepository } from './user.repository';
 
 @Service()
@@ -13,7 +15,9 @@ export class UserService {
   // using constructor injection
   constructor(
     @InjectRepository()
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    @InjectRepository()
+    private readonly tokenRepository: TokenRepository
   ) {}
 
   public async userExist(user: User): Promise<boolean> {
@@ -31,6 +35,10 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
+  public async me(email: string): Promise<User | undefined> {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   public async login(email: string, password: string): Promise<object> {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
@@ -43,7 +51,12 @@ export class UserService {
     if (!valid) {
       throw new CustomValidationError('Password is invalid.');
     }
-    const tokens = AuthHelper.setTokens(user);
+    const tokens = AuthHelper.getTokens(user);
+    const token = new Token();
+    token.email = email;
+    token.access = tokens.accessToken;
+    token.refresh = tokens.refreshToken;
+    await this.tokenRepository.save(token);
     return tokens;
   }
 }

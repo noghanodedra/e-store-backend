@@ -31,7 +31,7 @@ export class AuthHelper {
     );
   }
 
-  public static validateAccessToken(token: string): string | object {
+  public static validateAccessToken(token: string): any {
     try {
       return verify(token, envConfig.jwt.accessTokenSecret!);
     } catch (e) {
@@ -39,7 +39,7 @@ export class AuthHelper {
     }
   }
 
-  public static validateRefreshToken(token: string): string | object {
+  public static validateRefreshToken(token: string): any {
     try {
       return verify(token, process.env.REFRESH_TOKEN_SECRET!);
     } catch (e) {
@@ -47,13 +47,13 @@ export class AuthHelper {
     }
   }
 
-  public static setTokens(user: User): object {
+  public static getTokens(user: User): any {
     const accessToken = AuthHelper.createAccessToken(user);
     const refreshToken = AuthHelper.createRefreshToken(user);
     return { accessToken, refreshToken };
   }
 
-  public static tokenCookies (tokens: any): object {
+  public static tokenCookies (tokens: any): any {
     const { accessToken, refreshToken } = tokens;
     const cookieOptions = {
       httpOnly: process.env.HTTP_ONLY,

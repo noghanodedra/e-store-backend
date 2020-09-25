@@ -23,10 +23,10 @@ class App {
 
   constructor() {
     this.app = express();
-    this.config();
     this.dbSetup();
+    this.config();
     this.routes.routes(this.app);
-    this.middlerwareSetup();
+    this.app.use(handleErrors);
   }
 
   private config(): void {
@@ -34,11 +34,13 @@ class App {
       origin: envConfig.originUrl,
       credentials: true,
     };
+    this.app.use(cookieParser());
     this.app.use(cors(corsConfig));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.disable('x-powered-by'); // disable X-Powered-By header
     this.app.use(compression());
+    this.app.use(ValidateTokensMiddleware);
 
     const PORT = envConfig.port || 4000;
     this.app.listen(PORT, () => {
@@ -46,17 +48,10 @@ class App {
     });
   }
 
-  private middlerwareSetup(): void {
-    this.app.use(handleErrors);
-    this.app.use(ValidateTokensMiddleware);
-    this.app.use(cookieParser());
-
-  }
-
   private dbSetup(): void {
     const connectToDatabase = async (): Promise<void> => {
       const typeormconfig = this.getTypeOrmConfig();
-      console.log(typeormconfig);
+      // console.log(typeormconfig);
       await createConnection(typeormconfig);
     };
     connectToDatabase()
