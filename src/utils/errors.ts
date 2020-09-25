@@ -13,6 +13,9 @@ export class GeneralError extends Error {
     if (this instanceof CustomValidationError) {
       return StatusCodes.CONFLICT;
     }
+    if (this instanceof UnauthorizedError) {
+      return StatusCodes.UNAUTHORIZED;
+    }
     if (this instanceof NotFound) {
       return StatusCodes.NOT_FOUND;
     }
@@ -23,3 +26,4 @@ export class GeneralError extends Error {
 export class BadRequest extends GeneralError {}
 export class CustomValidationError extends GeneralError {}
 export class NotFound extends GeneralError {}
+export class UnauthorizedError extends GeneralError {}

@@ -19,7 +19,7 @@ export class User extends BaseEntity {
   @Column({ nullable: false })
   public fullName: string;
 
-  @Column({ default: false })
+  @Column({ nullable: false, default: true })
   public active: boolean;
 
   @Column({ nullable: false })
@@ -28,16 +28,16 @@ export class User extends BaseEntity {
   @Column({ nullable: false, select: false })
   public password: string;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   public avatarUrl?: string;
 
   @Column({ type: 'timestamp' })
   public lastLoggedIn: Date;
 
-  @Column({ default: false })
+  @Column({ nullable: false, default: false })
   public isAdmin: boolean;
 
-  @Column('int', { default: 0 })
+  @Column('int', { nullable: false, default: 0 })
   public tokenVersion: number;
 
   @CreateDateColumn()

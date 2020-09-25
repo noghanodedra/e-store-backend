@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+
 import { AuthController } from './auth.controller';
 
 export default class Routes {
@@ -19,7 +20,7 @@ export default class Routes {
       .post(this.controller.login);
     router
       .route(this.logoutAction)
-      .post(this.controller.logout);
+      .delete(this.controller.logout);
     router
       .route(this.refreshTokenAction)
       .post(this.controller.refreshToken);

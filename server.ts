@@ -4,6 +4,7 @@ import 'reflect-metadata';
 
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import Container from 'typedi';
@@ -12,6 +13,7 @@ import { ConnectionOptions, createConnection, useContainer } from 'typeorm';
 import envConfig from './src/configs';
 import { Routes } from './src/routes';
 import { handleErrors } from './src/utils/handle-errors';
+import { ValidateTokensMiddleware } from './src/utils/validate-tokens-middleware';
 
 useContainer(Container);
 
@@ -24,7 +26,7 @@ class App {
     this.config();
     this.dbSetup();
     this.routes.routes(this.app);
-    this.app.use(handleErrors);
+    this.middlerwareSetup();
   }
 
   private config(): void {
@@ -42,6 +44,13 @@ class App {
     this.app.listen(PORT, () => {
       console.log(`🚀 Server ready at http://localhost:${PORT}`);
     });
+  }
+
+  private middlerwareSetup(): void {
+    this.app.use(handleErrors);
+    this.app.use(ValidateTokensMiddleware);
+    this.app.use(cookieParser());
+
   }
 
   private dbSetup(): void {
