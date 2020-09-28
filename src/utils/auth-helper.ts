@@ -2,6 +2,7 @@ import { User } from '@entities/user';
 import { sign, verify } from 'jsonwebtoken';
 
 import envConfig from '../configs';
+import { CommonConstants } from '../constants/common';
 
 export class AuthHelper {
   public static createAccessToken(user: User): string {
@@ -41,7 +42,7 @@ export class AuthHelper {
 
   public static validateRefreshToken(token: string): any {
     try {
-      return verify(token, process.env.REFRESH_TOKEN_SECRET!);
+      return verify(token, envConfig.jwt.refreshTokenSecret!);
     } catch (e) {
       return '';
     }
@@ -56,14 +57,14 @@ export class AuthHelper {
   public static tokenCookies (tokens: any): any {
     const { accessToken, refreshToken } = tokens;
     const cookieOptions = {
-      httpOnly: process.env.HTTP_ONLY,
-      // secure: process.env.SECURE_COOKIE,
+      // httpOnly: envConfig.jwt.httpOnly,
+      // secure: envConfig.jwt.secureCookie,
       // domain: "your-website.com",
       // SameSite: None
     };
     return {
-      access: ['access', accessToken, cookieOptions],
-      refresh: ['refresh', refreshToken, cookieOptions],
+      access: [CommonConstants.ACCESS_COOKIE, accessToken, cookieOptions],
+      refresh: [CommonConstants.REFRESH_COOKIE, refreshToken, cookieOptions],
     };
   }
 

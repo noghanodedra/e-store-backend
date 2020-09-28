@@ -13,6 +13,7 @@
   },
   "_moduleAliases": {
     "@configs": "src/configs",
+    "@constants": "src/constants",
     "@entities": "src/entities",
     "@utils": "src/utils",
     "@shared": "src/api/shared"

@@ -1,3 +1,5 @@
+import { CommonMessages } from '@constants/messages';
+import { ValidationMessages } from '@constants/validation';
 import { Token } from '@entities/token';
 import { User } from '@entities/user';
 import { AuthHelper } from '@utils/auth-helper';
@@ -11,8 +13,7 @@ import { UserRepository } from './user.repository';
 
 @Service()
 export class UserService {
-  private PASSWORD_HASH_SEED = 15;
-  // using constructor injection
+  private PASSWORD_HASH_SEED = 12;
   constructor(
     @InjectRepository()
     private readonly userRepository: UserRepository,
@@ -28,7 +29,7 @@ export class UserService {
   public async create(user: User): Promise<User> {
     const recordExits = await this.userExist(user);
     if (recordExits) {
-      throw new CustomValidationError('Duplicate record');
+      throw new CustomValidationError(ValidationMessages.DUPLICATE_RECORD);
     }
     user.password = await hash(user.password, this.PASSWORD_HASH_SEED);
     return await this.userRepository.save(user);
@@ -41,14 +42,14 @@ export class UserService {
   public async login(email: string, password: string): Promise<object> {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
-      throw new CustomValidationError('User does not exist.');
+      throw new CustomValidationError(ValidationMessages.USER_DOES_NOT_EXIST);
     }
     if (user && !user.active) {
-      throw new CustomValidationError('User is inactive.');
+      throw new CustomValidationError(ValidationMessages.USER_IS_INACTIVE);
     }
     const valid = await compare(password, user.password);
     if (!valid) {
-      throw new CustomValidationError('Password is invalid.');
+      throw new CustomValidationError(ValidationMessages.PASSWORD_IS_INVALID);
     }
     return this.generateAndSaveTokens(user);
   }
@@ -67,16 +68,16 @@ export class UserService {
         !user ||
         user.tokenVersion !== decodedRefreshToken.user.tokenVersion
       ) {
-        throw new UnauthorizedError('Access denied');
+        throw new UnauthorizedError(CommonMessages.ACCESS_DENIED);
       }
       if (user && !user.active) {
-        throw new CustomValidationError('User is inactive.');
+        throw new CustomValidationError(ValidationMessages.USER_IS_INACTIVE);
       } else {
         await this.tokenRepository.removeToken(refreshToken);
         return this.generateAndSaveTokens(user);
       }
     } else {
-      throw new UnauthorizedError('Access denied');
+      throw new UnauthorizedError(CommonMessages.ACCESS_DENIED);
     }
   }
 

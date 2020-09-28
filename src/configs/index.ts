@@ -25,5 +25,7 @@ export default {
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
     accessTokenExpiryTime: process.env.ACCESS_TOKEN_EXPIRY_TIME,
     refreshTokenExpiryTime: process.env.REFRESH_TOKEN_EXPIRY_TIME,
+    httpOnly: process.env.HTTP_ONLY,
+    secureCookie: process.env.SECURE_COOKIE,
   },
 };

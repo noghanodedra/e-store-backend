@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { CommonConstants } from '@constants/common';
+import { CommonMessages } from '@constants/messages';
 import { Request, Response } from 'express';
 
 import { AuthHelper } from './auth-helper';
@@ -9,15 +11,15 @@ export const ValidateTokensMiddleware = async (
   res: Response,
   next: any
 ) => {
-  if (req.url.indexOf('/login') >= 0) {
+  if (req.url.indexOf(CommonConstants.LOGIN_URI) >= 0) {
     return next();
   }
   const accessToken = req.cookies.access;
   const decodedAccessToken = AuthHelper.validateAccessToken(accessToken);
   if (!decodedAccessToken || !decodedAccessToken.user) {
-    res.clearCookie('access');
-    res.clearCookie('refresh');
-    return next(new UnauthorizedError('Access is denied'));
+    res.clearCookie(CommonConstants.ACCESS_COOKIE);
+    res.clearCookie(CommonConstants.REFRESH_COOKIE);
+    return next(new UnauthorizedError(CommonMessages.ACCESS_DENIED));
   }
   return next();
 };
