@@ -1,7 +1,7 @@
 import { Token } from '@entities/token';
 import { User } from '@entities/user';
 import { AuthHelper } from '@utils/auth-helper';
-import { CustomValidationError } from '@utils/errors';
+import { CustomValidationError, UnauthorizedError } from '@utils/errors';
 import { compare, hash } from 'bcryptjs';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -22,7 +22,6 @@ export class UserService {
 
   public async userExist(user: User): Promise<boolean> {
     const record = await this.userRepository.findByEmail(user.email);
-    console.log('record', record);
     return record ? true : false;
   }
 
@@ -51,12 +50,44 @@ export class UserService {
     if (!valid) {
       throw new CustomValidationError('Password is invalid.');
     }
+    return this.generateAndSaveTokens(user);
+  }
+
+  public async logout(refreshToken: string): Promise<void> {
+    return await this.tokenRepository.removeToken(refreshToken);
+  }
+
+  public async refreshToken(refreshToken: string): Promise<object> {
+    const decodedRefreshToken = AuthHelper.validateRefreshToken(refreshToken);
+    if (decodedRefreshToken && decodedRefreshToken.user) {
+      const user = await User.findOne({
+        email: decodedRefreshToken.user.email,
+      });
+      if (
+        !user ||
+        user.tokenVersion !== decodedRefreshToken.user.tokenVersion
+      ) {
+        throw new UnauthorizedError('Access denied');
+      }
+      if (user && !user.active) {
+        throw new CustomValidationError('User is inactive.');
+      } else {
+        await this.tokenRepository.removeToken(refreshToken);
+        return this.generateAndSaveTokens(user);
+      }
+    } else {
+      throw new UnauthorizedError('Access denied');
+    }
+  }
+
+  private async generateAndSaveTokens(user: User): Promise<object> {
     const tokens = AuthHelper.getTokens(user);
     const token = new Token();
-    token.email = email;
+    token.email = user.email;
     token.access = tokens.accessToken;
     token.refresh = tokens.refreshToken;
-    await this.tokenRepository.save(token);
+    await this.tokenRepository.saveOrUpdate(token);
     return tokens;
   }
+
 }

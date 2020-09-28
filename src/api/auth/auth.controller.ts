@@ -29,7 +29,6 @@ export class AuthController {
         res.clearCookie('access');
         res.clearCookie('refresh');
         res.cookie(cookies.access[0], cookies.access[1], cookies.access[2]);
-        // tslint:disable-next-line: no-string-literal
         res.cookie(cookies.refresh[0], cookies.refresh[1], cookies.refresh[2]);
         res.status(StatusCodes.OK).json({ ...tokens });
       }
@@ -44,20 +43,15 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const params = req.body;
-      const { error } = validationSchema.auth.logout.validate(params, {
-        abortEarly: false,
-      });
-      console.log(error);
-      if (error?.details) {
-        res.status(StatusCodes.CONFLICT).json(error?.details);
+      const refreshToken = req.cookies.refresh;
+      if (!refreshToken) {
+        throw new BadRequest('Bad request');
       } else {
-        const { refreshToken } = params;
         const userService: UserService = Container.get(UserService);
+        await userService.logout(refreshToken);
         res.clearCookie('access');
         res.clearCookie('refresh');
-        // const result = await userService.login(username, password);
-        res.status(StatusCodes.NO_CONTENT);
+        res.status(StatusCodes.NO_CONTENT).send();
       }
     } catch (error: GeneralError | any) {
       next(error);
@@ -75,10 +69,14 @@ export class AuthController {
       if (!refreshToken) {
         throw new BadRequest('Bad request');
       } else {
+        res.clearCookie('access');
+        res.clearCookie('refresh');
         const userService: UserService = Container.get(UserService);
-
-        // const result = await userService.login(username, password);
-        res.status(StatusCodes.OK);
+        const tokens = await userService.refreshToken(refreshToken);
+        const cookies = AuthHelper.tokenCookies(tokens);
+        res.cookie(cookies.access[0], cookies.access[1], cookies.access[2]);
+        res.cookie(cookies.refresh[0], cookies.refresh[1], cookies.refresh[2]);
+        res.status(StatusCodes.OK).send({...tokens});
       }
     } catch (error: GeneralError | any) {
       next(error);
