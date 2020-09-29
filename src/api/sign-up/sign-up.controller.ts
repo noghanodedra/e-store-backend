@@ -1,6 +1,7 @@
 import { User } from '@entities/user';
 import { UserService } from '@shared/user.service';
 import { GeneralError } from '@utils/errors';
+import { validateData } from '@utils/validation-helper';
 import validationSchema from '@utils/validation-schemas';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -14,11 +15,9 @@ export class SignUpController {
   ): Promise<void> {
     try {
       const params = req.body;
-      const { error } = validationSchema.signUp.create.validate(params, {
-        abortEarly: false,
-      });
-      if (error?.details) {
-        res.status(StatusCodes.CONFLICT).json(error?.details);
+      const errors = validateData(params, validationSchema.signUp.create);
+      if (errors) {
+        res.status(StatusCodes.CONFLICT).json(errors);
       } else {
         const userService: UserService = Container.get(UserService);
         const user = new User();
@@ -29,7 +28,7 @@ export class SignUpController {
         user.active = true;
         user.avatarUrl = '';
         const { password, ...result } = await userService.create(user);
-        res.status(StatusCodes.CREATED).json({ result });
+        res.status(StatusCodes.CREATED).json({ ...result });
       }
     } catch (error: GeneralError | any) {
       next(error);

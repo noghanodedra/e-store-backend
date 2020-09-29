@@ -23,7 +23,6 @@ class App {
 
   constructor() {
     this.app = express();
-    this.dbSetup();
     this.config();
     this.routes.routes(this.app);
     this.app.use(handleErrors);
@@ -41,24 +40,15 @@ class App {
     this.app.disable('x-powered-by'); // disable X-Powered-By header
     this.app.use(compression());
     this.app.use(ValidateTokensMiddleware);
-
-    const PORT = envConfig.port || 4000;
-    this.app.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}`);
-    });
   }
 
-  private dbSetup(): void {
-    const connectToDatabase = async (): Promise<void> => {
+  // tslint:disable-next-line: member-ordering
+  public async dbSetup(): Promise<void> {
       const typeormconfig = this.getTypeOrmConfig();
       // console.log(typeormconfig);
       await createConnection(typeormconfig);
-    };
-    connectToDatabase()
-      .then(async () => {
-        console.log('Connected to database');
-      })
-      .catch((err) => console.log(err));
+      console.log('Connected to DB');
+      return;
   }
 
   private getTypeOrmConfig(): ConnectionOptions {
@@ -70,10 +60,13 @@ class App {
       username: envConfig.db.username,
       password: envConfig.db.password,
       entities: [__dirname + envConfig.db.entities],
-      logging: envConfig.db.logging === 'true' ? true : false,
+      logging: 'all', // envConfig.db.logging, // ['error' , 'query', 'all']
       synchronize: envConfig.db.synchronize === 'true' ? true : false,
       logger: 'advanced-console',
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dropSchema: envConfig.db.dropSchema === 'true' ? true : false,
     };
   }
 }
-export default new App().app;
+export default App;

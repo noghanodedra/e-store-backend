@@ -19,6 +19,7 @@ export default {
     logging: process.env.TYPEORM_LOGGING,
     entities: process.env.TYPEORM_ENTITIES,
     migrations: process.env.TYPEORM_MIGRATIONS,
+    dropSchema: process.env.TYPEORM_DROP_SCHEMA,
   },
   jwt: {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,

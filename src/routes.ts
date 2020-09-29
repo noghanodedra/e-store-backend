@@ -1,4 +1,5 @@
 import { Application } from 'express';
+
 import AuthRouter from './api/auth/auth.routes';
 import SignUpRouter from './api/sign-up/sign-up.routes';
 import envConfig from './configs';

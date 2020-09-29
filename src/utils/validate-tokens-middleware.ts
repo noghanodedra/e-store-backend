@@ -11,7 +11,10 @@ export const ValidateTokensMiddleware = async (
   res: Response,
   next: any
 ) => {
-  if (req.url.indexOf(CommonConstants.LOGIN_URI) >= 0) {
+  if (
+    req.url.indexOf(CommonConstants.LOGIN_URI) >= 0 ||
+    req.url.indexOf(CommonConstants.SIGN_UP_URI) >= 0
+  ) {
     return next();
   }
   const accessToken = req.cookies.access;

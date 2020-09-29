@@ -6,21 +6,36 @@ const PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
 export default {
   signUp: {
     create: Joi.object().keys({
-      fullName: Joi.string().min(2).required(),
-      email: Joi.string().regex(EMAIL_REGEX).email().required(),
-      password: Joi.string().regex(PASSWORD_REGEX).min(8).max(72).required(),
+      fullName: Joi.string().min(2).required().label('Full Name'),
+      email: Joi.string()
+        .regex(EMAIL_REGEX)
+        .email()
+        .required()
+        .label('Email')
+        .messages({
+          'string.pattern.base': `"Email" must be a valid email`,
+        }),
+      password: Joi.string()
+        .regex(PASSWORD_REGEX)
+        .min(8)
+        .max(72)
+        .required()
+        .label('Password')
+        .messages({
+          'string.pattern.base': `"Password" must be a valid password. It should contain at least one uppercase character, one lowercase character and one digit.`,
+        }),
     }),
   },
   auth: {
     login: Joi.object().keys({
-      username: Joi.string().email().required(),
-      password: Joi.string().min(8).max(72).required(),
+      username: Joi.string().email().required().label('User Name'),
+      password: Joi.string().min(8).max(72).required().label('Password'),
     }),
     logout: Joi.object().keys({
-      refreshToken: Joi.string().required(),
+      refreshToken: Joi.string().required().label('Refresh Token'),
     }),
     refreshToken: Joi.object().keys({
-      refreshToken: Joi.string().required(),
+      refreshToken: Joi.string().required().label('Refresh Token'),
     }),
   },
 };
