@@ -10,5 +10,17 @@ module.exports = {
     '^@shared(.*)$': '<rootDir>/api/shared/$1',
     '^@entities(.*)$': '<rootDir>/entities/$1',
     '^@utils(.*)$': '<rootDir>/utils/$1',
-  }
+  },
+  coverageDirectory: '../coverage',
+  coverageReporters: [
+    'json',
+    [
+      'lcov',
+      {
+        projectRoot: '../../',
+      },
+    ],
+    'text',
+    'clover',
+  ],
 };

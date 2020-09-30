@@ -59,7 +59,7 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon -w . --ext ts --exec ts-node index.ts",
     "start": "ts-node index.ts",
-    "test": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles",
+    "test": "NODE_ENV=test jest --forceExit --coverage --verbose --colors --detectOpenHandles",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix"
   },
   "repository": {

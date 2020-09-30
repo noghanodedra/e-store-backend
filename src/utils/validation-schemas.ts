@@ -31,11 +31,5 @@ export default {
       username: Joi.string().email().required().label('User Name'),
       password: Joi.string().min(8).max(72).required().label('Password'),
     }),
-    logout: Joi.object().keys({
-      refreshToken: Joi.string().required().label('Refresh Token'),
-    }),
-    refreshToken: Joi.object().keys({
-      refreshToken: Joi.string().required().label('Refresh Token'),
-    }),
   },
 };

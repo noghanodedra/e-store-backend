@@ -13,7 +13,7 @@ import { UserRepository } from './user.repository';
 
 @Service()
 export class UserService {
-  private PASSWORD_HASH_SEED = 12;
+  private PASSWORD_HASH_SEED = 127;
   constructor(
     @InjectRepository()
     private readonly userRepository: UserRepository,
