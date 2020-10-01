@@ -4,7 +4,7 @@ import { Token } from '@entities/token';
 import { User } from '@entities/user';
 import { AuthHelper } from '@utils/auth-helper';
 import { CustomValidationError, UnauthorizedError } from '@utils/errors';
-import { compare, hash } from 'bcryptjs';
+import { compare, genSalt, hash } from 'bcryptjs';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 
@@ -13,7 +13,7 @@ import { UserRepository } from './user.repository';
 
 @Service()
 export class UserService {
-  private PASSWORD_HASH_SEED = 127;
+  private PASSWORD_HASH_SEED = 5;
   constructor(
     @InjectRepository()
     private readonly userRepository: UserRepository,
@@ -31,7 +31,8 @@ export class UserService {
     if (recordExits) {
       throw new CustomValidationError(ValidationMessages.DUPLICATE_RECORD);
     }
-    user.password = await hash(user.password, this.PASSWORD_HASH_SEED);
+    const saltValue = await genSalt(this.PASSWORD_HASH_SEED);
+    user.password = await hash(user.password, saltValue);
     return await this.userRepository.save(user);
   }
 
@@ -61,7 +62,7 @@ export class UserService {
   public async refreshToken(refreshToken: string): Promise<object> {
     const decodedRefreshToken = AuthHelper.validateRefreshToken(refreshToken);
     if (decodedRefreshToken && decodedRefreshToken.user) {
-      const user = await User.findOne({
+      const user = await this.userRepository.findOne({
         email: decodedRefreshToken.user.email,
       });
       if (
